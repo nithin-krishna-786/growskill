@@ -15,12 +15,13 @@ import com.alippo.growskill.entities.ClassInCourse;
 public interface IStudentService {
 
 	Student registerStudent(Student student);
-	List<Enrollment> studentLogin(Student student);
+//	List<Enrollment> studentLogin(Student student);
 	Enrollment enrollInCourse(Integer StudentID, Integer courseID, PaymentStatus paymentStatus);
 	String attendClass(Enrollment enrollment, ClassInCourse classToAttend);
 	Certificate downloadCertificate(Enrollment enrollment);
 	List<Recording> downloadRecordings(Enrollment enrollment);
 	Enrollment getEnrollmentById(Integer enrollmentId) throws EnrollmentNotFoundException;
 	ClassInCourse getClassById(Integer classId,Integer enrollmentId) throws ClassInCourseNotFoundException;
+	Student login(String email, String password);
 
 }

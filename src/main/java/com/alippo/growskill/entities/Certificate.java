@@ -27,4 +27,6 @@ public class Certificate {
     
     @Column(name="download_link")	
 	private String downloadLink;
+
+    //hello
 }

@@ -1,5 +1,9 @@
 package com.alippo.growskill.entities;
 
+import java.util.Date;
+
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -11,7 +15,10 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 @Entity
@@ -26,14 +33,25 @@ public class Instructor {
 
 	@Column(name = "instructor_name")
 	private String instructorName;
-	
+
 	@Column(name = "specialization")
 	@Enumerated(EnumType.STRING)
 	private Specialization specialization;
-	
-	@Column(name = "phone_number")
+
+	@Column(name = "phone_number",unique = true)
 	private String phoneNumber;
-	
-	@Column(name = "email")
+
+	@Column(name = "email",unique = true)
 	private String email;
+
+	@Column(name = "password")
+	private String password;
+	
+    @CreationTimestamp
+    @Column(name="Date of Creation")
+    private Date creationDateAndTime;
+    
+    @Column(name="Last logged In")
+    private Date lastLoggedIn;
+
 }

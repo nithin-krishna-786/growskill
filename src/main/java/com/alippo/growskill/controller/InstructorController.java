@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import com.alippo.growskill.dto.InstructorDTO;
 import com.alippo.growskill.entities.Instructor;
 import com.alippo.growskill.entities.Specialization;
+import com.alippo.growskill.entities.Student;
 import com.alippo.growskill.mapper.MapperClass;
 import com.alippo.growskill.service.InstructorService;
 
@@ -27,25 +28,30 @@ public class InstructorController {
 	private ModelMapper modelMapper;
 
 	@PostMapping("/instructor")
-	public ResponseEntity<InstructorDTO> createInstructor(@RequestBody @Valid InstructorDTO instructorDTO) {
+	public ResponseEntity<Instructor> createInstructor(@RequestBody @Valid InstructorDTO instructorDTO) {
 		Instructor instructor = modelMapper.map(instructorDTO,Instructor.class);
-		Instructor createdInstructor = instructorService.createInstructor(instructor);
-		InstructorDTO result = modelMapper.map(createdInstructor,InstructorDTO.class);
-		return new ResponseEntity<>(result, HttpStatus.CREATED);
+		Instructor result = instructorService.createInstructor(instructor);
+		
+		if(result != null)
+			return new ResponseEntity<>(result, HttpStatus.CREATED);
+		else
+			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
 	@GetMapping("/instructor")
-	public ResponseEntity<List<InstructorDTO>> getAllInstructors() {
+	public ResponseEntity<List<Instructor>> getAllInstructors() {
 		List<Instructor> allInstructors = instructorService.getAllInstructors();
-		List<InstructorDTO> result = MapperClass.mapEntityListToDTOList(allInstructors);
-		return new ResponseEntity<>(result, HttpStatus.OK);
+		
+		if(allInstructors != null)
+			return new ResponseEntity<>(allInstructors, HttpStatus.OK);
+		else
+			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
 	@GetMapping("/{instructorID}")
-	public ResponseEntity<InstructorDTO> getInstructorById(@PathVariable("instructorID") int id) {
+	public ResponseEntity<Instructor> getInstructorById(@PathVariable("instructorID") int id) {
 		Instructor instructor = instructorService.getInstructorById(id);
-		InstructorDTO instructorDTO = MapperClass.mapEntityToDTO(instructor);
-		return ResponseEntity.ok(instructorDTO);
+		return ResponseEntity.ok(instructor);
 
 	}
 
@@ -64,5 +70,16 @@ public class InstructorController {
 		return ResponseEntity.ok("Instructor deleted successfully");
 	}
 
+	@GetMapping("/login")
+	public ResponseEntity<Instructor> logIn(String username,String password)
+	{
+		Instructor instructor = instructorService.logIn(username, password);
+		
+		if(instructor != null)
+			return new ResponseEntity<>(instructor,HttpStatus.OK);
+		else
+			return new ResponseEntity<>(null , HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
 	
 }
