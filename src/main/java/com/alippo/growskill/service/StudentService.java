@@ -1,8 +1,10 @@
 package com.alippo.growskill.service;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -24,6 +26,11 @@ import com.alippo.growskill.repository.CourseRepository;
 import com.alippo.growskill.repository.EnrollmentRepository;
 import com.alippo.growskill.repository.StudentRepository;
 
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
+import jakarta.validation.ValidatorFactory;
+
 public class StudentService implements IStudentService {
 
 	@Autowired
@@ -41,8 +48,22 @@ public class StudentService implements IStudentService {
 	@Autowired
 	private AdminService adminService;
 
+	private Validator validator;
+
+	public StudentService() {
+		ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+		this.validator = factory.getValidator();
+	}
+
 	@Override
 	public Student registerStudent(Student student) {
+
+		Set<ConstraintViolation<Student>> violations = validator.validate(student);
+		
+		if (!violations.isEmpty()) {
+			throw new IllegalArgumentException("Validation error: " + violations.iterator().next().getMessage());
+		}
+
 		return studentRepository.save(student);
 	}
 
@@ -70,12 +91,6 @@ public class StudentService implements IStudentService {
 
 	}
 
-	@Override
-	public List<Enrollment> studentLogin(Student student) {
-		Student result = studentRepository.findByEmailAndPassword(student.getEmail(), student.getPassword())
-				.orElseThrow(() -> new StudentNotFoundException("Student Not Found"));
-		return result.getEnrollments();
-	}
 
 	@Override
 	public String attendClass(Enrollment enrollment, ClassInCourse classToAttend) {
@@ -84,10 +99,10 @@ public class StudentService implements IStudentService {
 		if (enrollment.getNumberOfClassesCompleted().equals(enrollment.getCourse().getNumberOfClasses())) {
 			enrollment.setCompletionStatus(CompletionStatus.COMPLETED);
 			enrollment.setEligibleToDownload(true);
-			enrollmentRepository.save(enrollment);
 			Certificate certificate = adminService.createCertificate(enrollment);
 			enrollment.setCertificate(certificate);
 		}
+
 		enrollmentRepository.save(enrollment);
 		return classToAttend.getZoomLink();
 	}
@@ -125,7 +140,7 @@ public class StudentService implements IStudentService {
 	}
 
 	@Override
-	public ClassInCourse getClassById(Integer classId,Integer enrollmentId) throws ClassInCourseNotFoundException {
+	public ClassInCourse getClassById(Integer classId, Integer enrollmentId) throws ClassInCourseNotFoundException {
 
 		Optional<ClassInCourse> classFound = classInCourseRepository.findById(classId);
 
@@ -134,6 +149,18 @@ public class StudentService implements IStudentService {
 		else
 			throw new ClassInCourseNotFoundException("Class Not Found");
 
+	}
+
+	@Override
+	public Student login(String email, String password) {
+		Student student = studentRepository.findByEmailAndPassword(email, password)
+				.orElseThrow(() -> new StudentNotFoundException(
+						String.format("Student Not Found with given email:%s and passsword:%s", email, password)));
+
+		Date loggedDateAndTime = new Date();
+		student.setLastLoggedIn(loggedDateAndTime);
+		student = studentRepository.save(student);
+		return student;
 	}
 
 }

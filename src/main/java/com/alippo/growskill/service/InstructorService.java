@@ -1,5 +1,6 @@
 package com.alippo.growskill.service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -9,7 +10,9 @@ import org.springframework.stereotype.Service;
 
 import com.alippo.growskill.entities.Instructor;
 import com.alippo.growskill.entities.Specialization;
+import com.alippo.growskill.entities.Student;
 import com.alippo.growskill.exceptions.InstructorNotFoundException;
+import com.alippo.growskill.exceptions.StudentNotFoundException;
 import com.alippo.growskill.repository.InstructorRepository;
 
 @Service
@@ -64,6 +67,20 @@ public class InstructorService implements IInstructorService {
 		Specialization spec = Specialization.valueOf(specialization);
 		List<Instructor> instructors = instructorRepository.findBySpecialization(spec);
 		return instructors;
+	}
+
+	@Override
+	public Instructor logIn(String email, String password) {
+
+		Instructor instructor = instructorRepository.findByEmailAndPassword(email,password)
+				.orElseThrow(() -> new InstructorNotFoundException(
+						String.format("Instructor Not Found with given email:%s and passsword:%s", email, password)));
+
+
+		Date loggedDateAndTime = new Date();
+		instructor.setLastLoggedIn(loggedDateAndTime);
+		instructor = instructorRepository.save(instructor);
+		return instructor;
 	}
 
 }

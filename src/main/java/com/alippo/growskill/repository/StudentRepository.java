@@ -9,6 +9,7 @@ import com.alippo.growskill.entities.Student;
 
 @Repository
 public interface StudentRepository extends JpaRepository<Student, Integer> {
-
-	Optional<Student> findByEmailAndPassword(String email,String password);
+	
+	Optional<Student> findByEmailAndPassword(String email, String password);
+	
 }

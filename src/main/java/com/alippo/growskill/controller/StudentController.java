@@ -7,6 +7,8 @@ import com.alippo.growskill.dto.CertificateDTO;
 import com.alippo.growskill.dto.EnrollmentDTO;
 import com.alippo.growskill.dto.RecordingDTO;
 import com.alippo.growskill.dto.StudentDTO;
+import com.alippo.growskill.dto.StudentLogInDTO;
+import com.alippo.growskill.dto.StudentLoggedInDTO;
 import com.alippo.growskill.entities.Certificate;
 import com.alippo.growskill.entities.ClassInCourse;
 import com.alippo.growskill.entities.Enrollment;
@@ -15,6 +17,8 @@ import com.alippo.growskill.entities.Recording;
 import com.alippo.growskill.entities.Student;
 import com.alippo.growskill.exceptions.ClassInCourseNotFoundException;
 import com.alippo.growskill.service.IStudentService;
+
+import jakarta.validation.Valid;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +47,7 @@ public class StudentController {
 		StudentDTO result = modelMapper.map(registeredStudent, StudentDTO.class);
 		return new ResponseEntity<>(result, HttpStatus.CREATED);
 	}
+	
 
 	@PostMapping("/enroll/{studentId}/{courseId}")
 	public ResponseEntity<EnrollmentDTO> enrollInCourse(@PathVariable Integer studentId, @PathVariable Integer courseId,
@@ -52,15 +57,17 @@ public class StudentController {
 		return new ResponseEntity<>(enrollmentDTO, HttpStatus.CREATED);
 	}
 
+	
 	@PostMapping("/login")
-	public ResponseEntity<List<EnrollmentDTO>> studentLogin(@RequestBody StudentDTO studentDTO) {
-		Student student = modelMapper.map(studentDTO, Student.class);
-		List<Enrollment> enrollments = studentService.studentLogin(student);
-
-		List<EnrollmentDTO> enrollmentDTOs = enrollments.stream()
-				.map(enrollment -> modelMapper.map(enrollment, EnrollmentDTO.class)).collect(Collectors.toList());
-
-		return new ResponseEntity<>(enrollmentDTOs, HttpStatus.OK);
+	public ResponseEntity<Student> studentLogin(String email,String password) 
+	{
+		Student student = studentService.login(email, password);
+		
+		if(student != null)
+			return new ResponseEntity<>(student,HttpStatus.OK);
+		else
+			return new ResponseEntity<>(null,HttpStatus.INTERNAL_SERVER_ERROR);
+	
 	}
 
 	@PostMapping("/attendClass/{enrollmentId}/{classId}")
@@ -89,4 +96,5 @@ public class StudentController {
 				.collect(Collectors.toList());
 		return new ResponseEntity<>(recordingDTOs, HttpStatus.OK);
 	}
+	
 }

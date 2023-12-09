@@ -17,5 +17,6 @@ public interface IInstructorService {
 	List<Instructor> getInstructorsBySpecialization(String specialization);
 	Instructor updateInstructor(int instructorID, Instructor updatedInstructor);
 	void deleteInstructor(int instructorID);
+	Instructor logIn(String username,String password);
 
 }
