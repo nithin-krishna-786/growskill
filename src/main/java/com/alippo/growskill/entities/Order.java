@@ -23,6 +23,7 @@ public class Order {
 
 	@CreationTimestamp
 	private LocalDateTime dateCreated;
+	
 	@UpdateTimestamp
 	private LocalDateTime lastUpdated;
 

@@ -41,7 +41,7 @@ public class StudentController {
 	private ModelMapper modelMapper;
 
 	@PostMapping("/register")
-	public ResponseEntity<StudentDTO> registerStudent(@RequestBody StudentDTO studentDTO) {
+	public ResponseEntity<StudentDTO> registerStudent(@RequestBody  StudentDTO studentDTO) {
 		Student student = modelMapper.map(studentDTO, Student.class);
 		Student registeredStudent = studentService.registerStudent(student);
 		StudentDTO result = modelMapper.map(registeredStudent, StudentDTO.class);

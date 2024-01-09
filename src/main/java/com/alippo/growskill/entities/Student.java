@@ -44,6 +44,7 @@ public class Student {
 	private String password;
 	
 	@Column(name="phone_number",unique = true)
+	@Size(min = 10, message = "Phone number must be at least 10 Digits long")
 	@NotEmpty
     private String phoneNumber;
 

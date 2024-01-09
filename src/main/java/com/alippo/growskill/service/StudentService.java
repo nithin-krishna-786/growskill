@@ -91,12 +91,6 @@ public class StudentService implements IStudentService {
 
 	}
 
-//	@Override
-//	public List<Enrollment> studentLogin(Student student) {
-//		Student result = studentRepository.findByEmailAndPassword(student.getEmail(), student.getPassword())
-//				.orElseThrow(() -> new StudentNotFoundException("Student Not Found"));
-//		return result.getEnrollments();
-//	}
 
 	@Override
 	public String attendClass(Enrollment enrollment, ClassInCourse classToAttend) {
