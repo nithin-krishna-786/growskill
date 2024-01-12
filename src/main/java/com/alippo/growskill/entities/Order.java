@@ -16,9 +16,17 @@ public class Order {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
+	
+	@Column(name = "Order Tracking Number")
 	private String orderTrackingNumber;
+	
+	@Column(name = "Total Quantity")
 	private int totalQuantity;
+	
+	@Column(name = "Total Price")
 	private BigDecimal totalPrice;
+	
+	@Column(name = "Status")
 	private String status;
 
 	@CreationTimestamp

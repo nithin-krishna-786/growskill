@@ -2,7 +2,6 @@ package com.alippo.growskill.dto;
 
 import java.util.List;
 
-import com.alippo.growskill.entities.Instructor;
 import com.alippo.growskill.entities.Specialization;
 
 import lombok.Data;
