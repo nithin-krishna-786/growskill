@@ -49,6 +49,9 @@ public class StudentService implements IStudentService {
 
 	@Autowired
 	private AdminService adminService;
+	
+	@Autowired
+	private EmailSenderService emailSenderService;
 
 	private Validator validator;
 
@@ -71,7 +74,11 @@ public class StudentService implements IStudentService {
 		student.setVerified(false);
 		String passcode = generatePasscode(Constants.PASSCODE_LENGTH);
 		student.setPassCode(passcode);
-
+		
+		//SEND VERIFICATION EMAIL
+		String emailVerificationBody = Constants.EMAIL_VERIFICATION_BODY + student.getPassCode();
+		emailSenderService.sendSimpleEmail(student.getEmail(), emailVerificationBody, Constants.EMAIL_VERIFICATION_SUBJECT);
+		
 		return studentRepository.save(student);
 	}
 
