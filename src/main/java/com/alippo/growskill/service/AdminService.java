@@ -17,6 +17,7 @@ import com.alippo.growskill.entities.Recording;
 import com.alippo.growskill.entities.Specialization;
 import com.alippo.growskill.entities.Student;
 import com.alippo.growskill.exceptions.CourseNotFoundException;
+import com.alippo.growskill.exceptions.InstructorNotFoundException;
 import com.alippo.growskill.repository.CertificateRepository;
 import com.alippo.growskill.repository.ClassInCourseRepository;
 import com.alippo.growskill.repository.CourseRepository;
@@ -55,10 +56,12 @@ public class AdminService implements IAdminService {
 
 	@Override
 	public Course assignInstructorToCourse(Integer instructorId, Integer courseID) {
-		Optional<Instructor> instructor = instructorRepository.findById(instructorId);
-		Optional<Course> course = courseRepository.findById(courseID);
-		course.get().setInstructor(instructor.get());
-		Course result = courseRepository.save(course.get());
+		Instructor instructor = instructorRepository.findById(instructorId)
+				.orElseThrow(() -> new InstructorNotFoundException("Instructor Not Found"));
+		Course course = courseRepository.findById(courseID)
+				.orElseThrow(() -> new CourseNotFoundException("Course Not Found"));
+		course.setInstructor(instructor);
+		Course result = courseRepository.save(course);
 		return result;
 	}
 
@@ -76,9 +79,8 @@ public class AdminService implements IAdminService {
 
 		Course result = courseRepository.save(course);
 
-		Optional<ClassInCourse> res =  result.getClassList().stream()
-							.filter(c -> c.getTopic().equals(classInCourse.getTopic()))
-							.findFirst();
+		Optional<ClassInCourse> res = result.getClassList().stream()
+				.filter(c -> c.getTopic().equals(classInCourse.getTopic())).findFirst();
 
 		return res.get();
 	}

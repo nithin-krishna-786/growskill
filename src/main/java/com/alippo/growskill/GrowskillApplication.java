@@ -4,11 +4,15 @@ import org.modelmapper.ModelMapper;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+
 import com.alippo.growskill.service.AdminService;
 import com.alippo.growskill.service.IStudentService;
 import com.alippo.growskill.service.StudentService;
 
+
 @SpringBootApplication
+@ComponentScan(basePackages = "com.alippo.growskill")
 public class GrowskillApplication {
 	
 	@Bean

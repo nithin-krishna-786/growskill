@@ -26,5 +26,4 @@ public interface IStudentService {
 	String generatePasscode(Integer passcodeLength);
 	Boolean savePasscode(String email, String passcode);
 	boolean updatePassword(String email, String newPassword);
-
 }
