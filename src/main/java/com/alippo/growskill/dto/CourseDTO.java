@@ -2,13 +2,13 @@ package com.alippo.growskill.dto;
 
 import java.util.List;
 
-import com.alippo.growskill.entities.Specialization;
+import com.alippo.growskill.enums.Specialization;
 
 import lombok.Data;
 
 @Data
 public class CourseDTO {
-    private int id;
+    private Long id;
     private Specialization specialization;
     private List<ClassInCourseDTO> classList;
     private InstructorDTO instructor;

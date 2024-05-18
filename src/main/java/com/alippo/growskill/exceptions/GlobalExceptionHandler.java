@@ -42,6 +42,12 @@ public class GlobalExceptionHandler {
        return new ResponseEntity<>(errorDetails, HttpStatus.INTERNAL_SERVER_ERROR);
    }
 	
+	@ExceptionHandler(PasswordException.class)
+	 public ResponseEntity<ErrorDetails> handlePasswordException(PasswordException ex, WebRequest request) {
+      ErrorDetails errorDetails = new ErrorDetails(new Date(), ex.getMessage(), request.getDescription(false));
+      return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
+  }
+	
 	@ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorDetails> handleAnyOtherException(Exception ex, WebRequest request) {
         ErrorDetails errorDetails = new ErrorDetails(new Date(), ex.getMessage(), request.getDescription(false));

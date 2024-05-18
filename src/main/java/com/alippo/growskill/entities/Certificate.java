@@ -20,7 +20,7 @@ public class Certificate {
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)	
     @Column(name="certificate_id")	
-	private int id;
+	private Long id;
     
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "enrollment_id",referencedColumnName = "enrollment_id")
@@ -28,5 +28,6 @@ public class Certificate {
     
     @Column(name="download_link")	
 	private String downloadLink;
+    
 
 }

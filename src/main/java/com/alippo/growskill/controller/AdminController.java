@@ -8,7 +8,7 @@ import com.alippo.growskill.entities.Certificate;
 import com.alippo.growskill.entities.ClassInCourse;
 import com.alippo.growskill.entities.Course;
 import com.alippo.growskill.entities.Enrollment;
-import com.alippo.growskill.entities.Specialization;
+import com.alippo.growskill.enums.Specialization;
 import com.alippo.growskill.exceptions.CourseNotFoundException;
 import com.alippo.growskill.exceptions.EnrollmentNotFoundException;
 import com.alippo.growskill.repository.EnrollmentRepository;
@@ -40,7 +40,7 @@ public class AdminController {
 	@Autowired
 	private EnrollmentRepository enrollmentRepository;
 
-	@PostMapping("/create-certificate/{enrollmentID}")
+	@PostMapping("/certificate/{enrollmentID}")
 	public ResponseEntity<CertificateDTO> createCertificate(@PathVariable("enrolmentID") Integer id) {
 		Optional<Enrollment> enrollment = enrollmentRepository.findById(id);
 
@@ -53,7 +53,7 @@ public class AdminController {
 
 	}
 
-	@PostMapping("/create-course")
+	@PostMapping("/course")
 	public ResponseEntity<CourseDTO> createCourse(@RequestParam Specialization specialization,
 			@RequestParam int numberOfClasses) {
 		Course course = adminService.createCourse(specialization, numberOfClasses);
@@ -61,7 +61,7 @@ public class AdminController {
 		return new ResponseEntity<>(courseDTO, HttpStatus.CREATED);
 	}
 
-	@PostMapping("/create-class/{courseID}")
+	@PostMapping("/class/{courseID}")
 	public ResponseEntity<ClassInCourseDTO> createClassInCourse(@PathVariable("courseID") Integer courseID,
 			@RequestBody ClassInCourseDTO classInCourseDTO) {
 

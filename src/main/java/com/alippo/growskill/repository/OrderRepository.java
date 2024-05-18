@@ -7,5 +7,4 @@ import com.alippo.growskill.entities.Order;
 
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Long> {
-    Order findByOrderTrackingNumber(String orderTrackingNumber);
 }

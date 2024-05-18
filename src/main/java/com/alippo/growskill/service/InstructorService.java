@@ -8,8 +8,12 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.alippo.growskill.dto.AddressDTO;
+import com.alippo.growskill.dto.InstructorDTO;
+import com.alippo.growskill.entities.Address;
 import com.alippo.growskill.entities.Instructor;
-import com.alippo.growskill.entities.Specialization;
+import com.alippo.growskill.entities.User;
+import com.alippo.growskill.enums.Specialization;
 import com.alippo.growskill.exceptions.InstructorNotFoundException;
 import com.alippo.growskill.repository.InstructorRepository;
 
@@ -18,12 +22,46 @@ public class InstructorService implements IInstructorService {
 
 	@Autowired
 	private InstructorRepository instructorRepository;
-
+	
 	@Autowired
 	private ModelMapper modelMapper;
 
-	public Instructor createInstructor(Instructor instructor) {
-		return instructorRepository.save(instructor);
+//	public InstructorDTO createInstructor(InstructorDTO instructorDTO) {
+//		
+//		AddressDTO addressDTO = instructorDTO.getAddress();
+//		
+//		Instructor instructor = modelMapper.map(instructorDTO, Instructor.class);
+//		
+//		//CONVERT addressDTO to address
+//		Address address = modelMapper.map(addressDTO, Address.class);
+//		
+//		instructor.setAddress(address);
+//		
+//		//Save instructor
+//		instructor = instructorRepository.save(instructor);
+//		
+//		instructorDTO = modelMapper.map(instructor, InstructorDTO.class);
+//		return instructorDTO;
+//	}
+	
+	public InstructorDTO createInstructor(InstructorDTO instructorDTO) {
+		
+		AddressDTO addressDTO = instructorDTO.getAddress();
+		
+		Instructor instructor = modelMapper.map(instructorDTO, Instructor.class);
+		
+		User user = (User) instructor;
+		
+		//CONVERT addressDTO to address
+		Address address = modelMapper.map(addressDTO, Address.class);
+		
+		instructor.setAddress(address);
+		
+		//Save instructor
+		instructor = instructorRepository.save(instructor);
+		
+		instructorDTO = modelMapper.map(instructor, InstructorDTO.class);
+		return instructorDTO;
 	}
 
 	public List<Instructor> getAllInstructors() {
@@ -39,18 +77,16 @@ public class InstructorService implements IInstructorService {
 			throw new InstructorNotFoundException("Instructor not found for given id:" + instructorID);
 	}
 
-	public Instructor updateInstructor(int instructorID, Instructor updatedInstructor) {
-		Optional<Instructor> existingInstructor = instructorRepository.findById(instructorID);
+	public InstructorDTO updateInstructor(int instructorID, InstructorDTO instructorDTO) {
+		
+		Instructor instructor = instructorRepository.findById(instructorID).orElseThrow(
+				() -> new InstructorNotFoundException("Instructor not found for given id:" + instructorID));
 
-		if (existingInstructor.isPresent()) {
-			Instructor instructorToUpdate = existingInstructor.get();
-			instructorToUpdate.setInstructorName(updatedInstructor.getInstructorName());
-			instructorToUpdate.setSpecialization(updatedInstructor.getSpecialization());
-
-			return instructorRepository.save(instructorToUpdate);
-		} else {
-			throw new InstructorNotFoundException("Instructor not found for given id:" + instructorID);
-		}
+		instructor = modelMapper.map(instructorDTO, Instructor.class);
+		instructor =  instructorRepository.save(instructor);
+		
+		instructorDTO = modelMapper.map(instructor,InstructorDTO.class);
+		return instructorDTO;
 	}
 
 	public void deleteInstructor(int instructorID) {
@@ -67,18 +103,5 @@ public class InstructorService implements IInstructorService {
 		return instructors;
 	}
 
-	@Override
-	public Instructor logIn(String email, String password) {
-
-		Instructor instructor = instructorRepository.findByEmailAndPassword(email,password)
-				.orElseThrow(() -> new InstructorNotFoundException(
-						String.format("Instructor Not Found with given email:%s and passsword:%s", email, password)));
-
-
-		Date loggedDateAndTime = new Date();
-		instructor.setLastLoggedIn(loggedDateAndTime);
-		instructor = instructorRepository.save(instructor);
-		return instructor;
-	}
 
 }

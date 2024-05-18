@@ -1,7 +1,7 @@
 package com.alippo.growskill.repositories;
 
 import com.alippo.growskill.entities.Instructor;
-import com.alippo.growskill.entities.Specialization;
+import com.alippo.growskill.enums.Specialization;
 import com.alippo.growskill.repository.InstructorRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

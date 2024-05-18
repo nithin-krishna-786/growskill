@@ -1,14 +1,15 @@
 package com.alippo.growskill.dto;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 import lombok.Data;
 
 @Data
 public class ClassInCourseDTO {
-    private int id;
+    private Long id;
     private Integer courseId;
-    private Date classDateAndTime;
+    private LocalDateTime classDateAndTime;
     private String topic;
     private String zoomLink;
     private RecordingDTO recording;

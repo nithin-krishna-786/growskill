@@ -1,12 +1,10 @@
 package com.alippo.growskill.entities;
 
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
+import com.alippo.growskill.enums.OrderStatus;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 
 @Data
 @Entity
@@ -15,29 +13,22 @@ public class Order {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private long id;
-	
-	@Column(name = "Order Tracking Number")
-	private String orderTrackingNumber;
-	
+	private Long id;
+
 	@Column(name = "Total Quantity")
-	private int totalQuantity;
-	
+	private Integer totalQuantity;
+
 	@Column(name = "Total Price")
 	private BigDecimal totalPrice;
-	
+
 	@Column(name = "Status")
-	private String status;
+	private OrderStatus orderStatus;
 
-	@CreationTimestamp
-	private LocalDateTime dateCreated;
-	
-	@UpdateTimestamp
-	private LocalDateTime lastUpdated;
-
-	@OneToOne(cascade = CascadeType.ALL, mappedBy = "order")
+	@OneToOne(cascade = CascadeType.ALL)
+	@JoinColumn(name = "billing_address_id", referencedColumnName = "id")
 	private Address billingAddress;
 
 	public Order() {
+
 	}
 }

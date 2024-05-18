@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class CertificateDTO {
-    private int id;
-    private int enrollmentId;
+    private Integer id;
+    private Integer enrollmentId;
     private String downloadLink;
 }

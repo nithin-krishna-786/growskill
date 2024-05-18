@@ -1,33 +1,47 @@
 package com.alippo.growskill.service;
 
 import java.security.SecureRandom;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
+import com.alippo.growskill.dto.CreateStudentRequestDTO;
+import com.alippo.growskill.dto.ForgotPasswordDTO;
+import com.alippo.growskill.entities.Address;
 import com.alippo.growskill.entities.Certificate;
 import com.alippo.growskill.entities.ClassInCourse;
-import com.alippo.growskill.entities.CompletionStatus;
 import com.alippo.growskill.entities.Course;
 import com.alippo.growskill.entities.Enrollment;
-import com.alippo.growskill.entities.PaymentStatus;
 import com.alippo.growskill.entities.Recording;
 import com.alippo.growskill.entities.Student;
+import com.alippo.growskill.entities.User;
+import com.alippo.growskill.enums.CompletionStatus;
+import com.alippo.growskill.enums.PaymentStatus;
 import com.alippo.growskill.exceptions.ClassInCourseNotFoundException;
 import com.alippo.growskill.exceptions.CourseNotFoundException;
+import com.alippo.growskill.exceptions.CredentialsException;
 import com.alippo.growskill.exceptions.EnrollmentNotFoundException;
+import com.alippo.growskill.exceptions.PasswordException;
 import com.alippo.growskill.exceptions.PaymentNotDoneException;
 import com.alippo.growskill.exceptions.StudentNotFoundException;
+import com.alippo.growskill.exceptions.UserNotFoundException;
 import com.alippo.growskill.repository.ClassInCourseRepository;
 import com.alippo.growskill.repository.CourseRepository;
 import com.alippo.growskill.repository.EnrollmentRepository;
 import com.alippo.growskill.repository.StudentRepository;
+import com.alippo.growskill.repository.UserRepository;
 import com.alippo.growskill.util.Constants;
 
+import jakarta.transaction.Transactional;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
@@ -45,13 +59,19 @@ public class StudentService implements IStudentService {
 	private EnrollmentRepository enrollmentRepository;
 
 	@Autowired
+	private UserRepository userRepository;
+
+	@Autowired
 	private ClassInCourseRepository classInCourseRepository;
 
 	@Autowired
 	private AdminService adminService;
-	
+
 	@Autowired
 	private EmailSenderService emailSenderService;
+	
+	@Autowired
+	private PasswordEncoder passwordEncoder;
 
 	private Validator validator;
 
@@ -59,27 +79,63 @@ public class StudentService implements IStudentService {
 		ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
 		this.validator = factory.getValidator();
 	}
+	
+
 
 	@Override
-	public Student registerStudent(Student student) {
+	public Student registerStudent(CreateStudentRequestDTO studentDTO) {
+
+		// check username is already exists in database
+		if (userRepository.existsByUsername(studentDTO.getUserName())) {
+			throw new CredentialsException(HttpStatus.BAD_REQUEST, "Username already exists!");
+		}
+
+		// check email is already exists in database
+		if (userRepository.existsByEmail(studentDTO.getEmail())) {
+			throw new CredentialsException(HttpStatus.BAD_REQUEST, "Email is already exists!.");
+		}
+
+		Student student = new Student();
+		student.setName(studentDTO.getStudentName());
+		student.setUsername(studentDTO.getUserName());
+		student.setPassword(passwordEncoder.encode(studentDTO.getPassword()));
+		student.setEmail(studentDTO.getEmail());
+		student.setPhoneNumber(studentDTO.getPhoneNumber());
+
+		Address address = new Address();
+		address.setStreet(studentDTO.getStreet());
+		address.setCity(studentDTO.getCity());
+		address.setState(studentDTO.getState());
+		address.setCountry(studentDTO.getCountry());
+		address.setZipCode(studentDTO.getZipCode());
+
+		student.setAddress(address);
+		address.setUser(student);
 
 		Set<ConstraintViolation<Student>> violations = validator.validate(student);
 
 		if (!violations.isEmpty()) {
 			throw new IllegalArgumentException("Validation error: " + violations.iterator().next().getMessage());
 		}
-		Date creationDateAndTime = new Date();
+
+		LocalDateTime creationDateAndTime = LocalDateTime.now();
 		student.setCreationDateAndTime(creationDateAndTime);
 
 		student.setVerified(false);
 		String passcode = generatePasscode(Constants.PASSCODE_LENGTH);
 		student.setPassCode(passcode);
-		
-		//SEND VERIFICATION EMAIL
-		String emailVerificationBody = Constants.EMAIL_VERIFICATION_BODY + student.getPassCode();
-		emailSenderService.sendSimpleEmail(student.getEmail(), emailVerificationBody, Constants.EMAIL_VERIFICATION_SUBJECT);
-		
-		return studentRepository.save(student);
+
+		student = studentRepository.save(student);
+
+		sendOutEmailWithPasscode(student);
+
+		return student;
+	}
+
+	private void sendOutEmailWithPasscode(Student student) {
+		String emailVerificationBody = Constants.PASSCODE + student.getPassCode();
+		emailSenderService.sendSimpleEmail(student.getEmail(), emailVerificationBody,
+				Constants.EMAIL_VERIFICATION_SUBJECT);
 	}
 
 	@Override
@@ -93,11 +149,9 @@ public class StudentService implements IStudentService {
 		Enrollment enrollment = new Enrollment();
 		enrollment.setCourse(course);
 		enrollment.setStudent(student);
-		enrollment.setNumberOfClassesCompleted(0);
 		enrollment.setCompletionStatus(CompletionStatus.NOT_COMPLETED);
-		enrollment.setCertificate(null);
 
-		if (paymentStatus == PaymentStatus.PAID || paymentStatus == PaymentStatus.HALF_PAID)
+		if (paymentStatus == PaymentStatus.COMPLETE)
 			enrollment.setPaymentStatus(paymentStatus);
 		else
 			throw new PaymentNotDoneException("Payment is not Done");
@@ -150,7 +204,7 @@ public class StudentService implements IStudentService {
 		if (enrollment.isPresent())
 			return enrollment.get();
 		else
-			throw new EnrollmentNotFoundException("EnrollmentNotFound");
+			throw new EnrollmentNotFoundException("Enrollment Not Found:"+enrollmentId);
 	}
 
 	@Override
@@ -165,33 +219,18 @@ public class StudentService implements IStudentService {
 
 	}
 
-	@Override
-	public Student login(String email, String password) {
-		Student student = studentRepository.findByEmailAndPassword(email, password)
-				.orElseThrow(() -> new StudentNotFoundException(
-						String.format("Student Not Found with given email:%s and passsword:%s", email, password)));
-
-		Date loggedDateAndTime = new Date();
-		student.setLastLoggedIn(loggedDateAndTime);
-		student = studentRepository.save(student);
-		return student;
-	}
 
 	@Override
 	public Boolean validatePasscode(String email, String passcode) {
 
-		Student student = studentRepository.findByEmail(email);
-		
-		if(student == null)
-			return false;
+		Student student = studentRepository.findByEmail(email)
+				.orElseThrow(() -> new StudentNotFoundException("Student Not found for given email:" + email));
 
-		if (student.getPassCode().equals(passcode))
-		{	
+		if (student.getPassCode().equals(passcode)) {
 			student.setVerified(true);
 			studentRepository.save(student);
 			return true;
-		}	
-		else
+		} else
 			return false;
 	}
 
@@ -209,31 +248,61 @@ public class StudentService implements IStudentService {
 	}
 
 	@Override
-	public Boolean savePasscode(String email, String passcode) {
+	public void savePasscode(String email, String passcode) {
 
-		Student student = studentRepository.findByEmail(email);
+		Student student = studentRepository.findByEmail(email)
+				.orElseThrow(() -> new StudentNotFoundException("Student Not found for given email:" + email));
 
-		if (student != null) {
-			student.setPassCode(passcode);
-			studentRepository.save(student);
-			return true;
-		}
+		student.setPassCode(passcode);
+		studentRepository.save(student);
 
-		return false;
 	}
 
 	@Override
-	public boolean updatePassword(String email, String newPassword) {
-		Student student = studentRepository.findByEmail(email);
-		
-		 if(student == null)
-			   return false;
-		 else 
-		 {
-			 student.setPassword(newPassword);
-			 studentRepository.save(student);
-			 return true;
-		 }
+	public void updatePassword(String email, String newPassword) {
+		Student student = studentRepository.findByEmail(email)
+				.orElseThrow(() -> new StudentNotFoundException("Student Not found for given email:" + email));
+
+		student.setPassword(passwordEncoder.encode(newPassword));
+		studentRepository.save(student);
 	}
+
+	@Override
+	@Transactional
+	public void forgotPassword(String email) {
+		
+//		 	GenerateNewPassCode
+//		    UpdateNewPassCode
+//		    SendOutNewPassCodeToEmail WITH RESET LINK
+		
+		Student student = studentRepository.findByEmail(email)
+				.orElseThrow(() -> new StudentNotFoundException("Student Not found for given email:" + email));
+		
+		String newPasscode = generatePasscode(Constants.PASSCODE_LENGTH);
+		savePasscode(email,newPasscode);
+		sendOutEmailWithPasscodeAndVerificationLink(student);
+	}
+
+	private void sendOutEmailWithPasscodeAndVerificationLink(Student student) {
+		String passcode = Constants.PASSCODE + student.getPassCode();
+		String forgotPasswordLink = Constants.FORGOT_PASSWORD_LINK;
+		String emailBody =  Constants.PASSCODE + passcode + "\n" + forgotPasswordLink;
+		
+		emailSenderService.sendSimpleEmail(student.getEmail(), emailBody,
+				Constants.EMAIL_RESET_SUBJECT);
+	}
+
+	@Override
+	public void forgotPasswordSubmision(ForgotPasswordDTO forgotPasswordDTO) {
+		
+		if(!forgotPasswordDTO.getNewPassword().equals(forgotPasswordDTO.getConfirmNewPassword()))
+		{
+			throw new PasswordException("New Password and Confirmed New Password are not the same");
+		}
+		
+		
+		
+	}
+
 
 }

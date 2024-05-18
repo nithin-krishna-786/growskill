@@ -5,18 +5,18 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
+import com.alippo.growskill.dto.InstructorDTO;
 import com.alippo.growskill.entities.Instructor;
-import com.alippo.growskill.entities.Specialization;
+import com.alippo.growskill.enums.Specialization;
 
 @Service
 public interface IInstructorService {
 
-	Instructor createInstructor(Instructor instructor);
+	InstructorDTO createInstructor(InstructorDTO instructorDTO);
 	List<Instructor> getAllInstructors();
 	Instructor getInstructorById(int instructorID);
 	List<Instructor> getInstructorsBySpecialization(String specialization);
-	Instructor updateInstructor(int instructorID, Instructor updatedInstructor);
+	InstructorDTO updateInstructor(int instructorID, InstructorDTO instructorDTO);
 	void deleteInstructor(int instructorID);
-	Instructor logIn(String username,String password);
 
 }

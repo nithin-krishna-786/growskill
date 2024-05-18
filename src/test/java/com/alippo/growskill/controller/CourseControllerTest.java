@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.alippo.growskill.controller.CourseController;
 import com.alippo.growskill.dto.CourseDTO;
 import com.alippo.growskill.entities.Course;
-import com.alippo.growskill.entities.Specialization;
+import com.alippo.growskill.enums.Specialization;
 import com.alippo.growskill.service.CourseService;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;

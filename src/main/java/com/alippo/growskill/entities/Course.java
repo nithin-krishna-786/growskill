@@ -3,6 +3,8 @@ package com.alippo.growskill.entities;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.alippo.growskill.enums.Specialization;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -25,8 +27,7 @@ public class Course {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "course_id")
-	private int id;
+	private Long id;
 
 	@Column(name = "specialization")
 	@Enumerated(EnumType.STRING)
@@ -36,7 +37,7 @@ public class Course {
 	private List<ClassInCourse> classList = new ArrayList<>();
 
 	@OneToOne
-	@JoinColumn(name = "instructor_id", referencedColumnName = "instructor_id")
+	@JoinColumn(name = "instructor_id", referencedColumnName = "id")
 	private Instructor instructor;
 	
 	@Column(name ="number_of_classes")

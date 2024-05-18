@@ -19,11 +19,10 @@ public class Recording {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name="recording_id")
-	private int id;
+	private Long id;
 
 	@OneToOne(cascade = CascadeType.ALL)
-	@JoinColumn(name = "class_id", referencedColumnName = "class_id")
+	@JoinColumn(name = "class_In_Course_id", referencedColumnName = "id")
 	private ClassInCourse classRelatedToRecording;
 	
 	@Column(name="recording_link")

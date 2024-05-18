@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import com.alippo.growskill.entities.Instructor;
-import com.alippo.growskill.entities.Specialization;
+import com.alippo.growskill.enums.Specialization;
 
 @Repository
 public interface InstructorRepository extends JpaRepository<Instructor, Integer> {
