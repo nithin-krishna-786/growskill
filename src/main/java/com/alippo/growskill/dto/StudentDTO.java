@@ -6,7 +6,7 @@ import com.alippo.growskill.entities.Enrollment;
 
 public class StudentDTO {
 	
-	 private List<Enrollment> enrollments;	
+	 private List<EnrollmentDTO> enrollments;	
 	    
 	 private String college;
 	    

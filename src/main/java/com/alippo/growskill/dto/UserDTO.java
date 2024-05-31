@@ -1,8 +1,5 @@
 package com.alippo.growskill.dto;
 
-
-
-import com.alippo.growskill.entities.Address;
 import lombok.Data;
 
 @Data
@@ -24,6 +21,6 @@ public class UserDTO {
 
 	private String passCode;
 
-	private Address address;
+	private AddressDTO address;
 
 }
