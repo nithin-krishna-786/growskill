@@ -4,12 +4,15 @@ import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.alippo.growskill.dto.StudentDTO;
 import com.alippo.growskill.entities.Certificate;
 import com.alippo.growskill.entities.ClassInCourse;
 import com.alippo.growskill.entities.CompletionStatus;
@@ -17,6 +20,7 @@ import com.alippo.growskill.entities.Course;
 import com.alippo.growskill.entities.Enrollment;
 import com.alippo.growskill.entities.PaymentStatus;
 import com.alippo.growskill.entities.Recording;
+import com.alippo.growskill.entities.Role;
 import com.alippo.growskill.entities.Student;
 import com.alippo.growskill.exceptions.ClassInCourseNotFoundException;
 import com.alippo.growskill.exceptions.CourseNotFoundException;
@@ -26,6 +30,7 @@ import com.alippo.growskill.exceptions.StudentNotFoundException;
 import com.alippo.growskill.repository.ClassInCourseRepository;
 import com.alippo.growskill.repository.CourseRepository;
 import com.alippo.growskill.repository.EnrollmentRepository;
+import com.alippo.growskill.repository.RoleRepository;
 import com.alippo.growskill.repository.StudentRepository;
 import com.alippo.growskill.util.Constants;
 
@@ -54,31 +59,27 @@ public class StudentService implements IStudentService {
 	@Autowired
 	private EmailSenderService emailSenderService;
 
-	private Validator validator;
+	@Autowired
+	private ModelMapper modelMapper;
+	
+	@Autowired
+	private RoleRepository roleRepository;
 
-	public StudentService() {
-		ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-		this.validator = factory.getValidator();
-	}
-
-	@Override
 	public Student registerStudent(Student student) {
-
-		Set<ConstraintViolation<Student>> violations = validator.validate(student);
-
-		if (!violations.isEmpty()) {
-			throw new IllegalArgumentException("Validation error: " + violations.iterator().next().getMessage());
-		}
-		LocalDateTime creationDateAndTime = LocalDateTime.now();
-		student.setCreationDateAndTime(creationDateAndTime);
-
+		
+		Set<Role> roles = new HashSet<>();
+		Role userRole = roleRepository.findByName("ROLE_STUDENT");
+		roles.add(userRole);
+		student.setRoles(roles);
+		
 		student.setVerified(false);
+
 		String passcode = generatePasscode(Constants.PASSCODE_LENGTH);
 		student.setPassCode(passcode);
 		
 		//SEND VERIFICATION EMAIL
-		String emailVerificationBody = Constants.EMAIL_VERIFICATION_BODY + student.getPassCode();
-		emailSenderService.sendSimpleEmail(student.getEmail(), emailVerificationBody, Constants.EMAIL_VERIFICATION_SUBJECT);
+//		String emailVerificationBody = Constants.EMAIL_VERIFICATION_BODY + student.getPassCode();
+//		emailSenderService.sendSimpleEmail(student.getEmail(), emailVerificationBody, Constants.EMAIL_VERIFICATION_SUBJECT);
 		
 		return studentRepository.save(student);
 	}
@@ -169,17 +170,6 @@ public class StudentService implements IStudentService {
 
 	}
 
-	@Override
-	public Student login(String email, String password) {
-		Student student = studentRepository.findByEmailAndPassword(email, password)
-				.orElseThrow(() -> new StudentNotFoundException(
-						String.format("Student Not Found with given email:%s and passsword:%s", email, password)));
-
-		LocalDateTime loggedDateAndTime = LocalDateTime.now();
-		student.setLastLoggedIn(loggedDateAndTime);
-		student = studentRepository.save(student);
-		return student;
-	}
 
 	@Override
 	public Boolean validatePasscode(String email, String passcode) {
@@ -227,7 +217,7 @@ public class StudentService implements IStudentService {
 	}
 
 	@Override
-	public boolean updatePassword(String email, String newPassword) {
+	public Boolean updatePassword(String email, String newPassword) {
 		Student student = studentRepository.findByEmail(email);
 		
 		 if(student == null)

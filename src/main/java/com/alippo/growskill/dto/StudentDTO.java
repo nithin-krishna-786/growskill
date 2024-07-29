@@ -1,7 +1,6 @@
 
 package com.alippo.growskill.dto;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import jakarta.validation.constraints.NotEmpty;
@@ -14,8 +13,8 @@ public class StudentDTO extends UserDTO{
 	@NotEmpty(message = "College should be non-empty")
 	private String college;
 	
-	private LocalDateTime creationDateAndTime;
-	private LocalDateTime lastLoggedIn;
-	private Boolean verified;
-	private String passCode;
+	private Boolean enrollBaking;
+	private Boolean enrollMakeups;
+	private Boolean enrollHandicrafts;
+	
 }

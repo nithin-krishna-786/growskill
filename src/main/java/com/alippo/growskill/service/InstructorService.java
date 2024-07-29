@@ -29,30 +29,7 @@ public class InstructorService implements IInstructorService {
 	@Autowired
 	private RoleRepository roleRepository;
 
-	@Autowired
-	private ModelMapper modelMapper;
 
-	public Instructor createInstructor(Instructor instructor) {
-
-		Set<Role> roles = new HashSet<>();
-		Role userRole = roleRepository.findByName("ROLE_INSTRUCTOR");
-		roles.add(userRole);
-
-		instructor.setRoles(roles);
-
-		instructor.setVerified(false);
-
-		int passcode = generatePasscode(Constants.PASSCODE_LENGTH);
-		instructor.setPassCode(String.valueOf(passcode));
-
-		return instructorRepository.save(instructor);
-	}
-
-	public static int generatePasscode(int length) {
-		Random random = new Random();
-		int passcode = random.nextInt((int) Math.pow(10, length));
-		return passcode;
-	}
 
 	public List<Instructor> getAllInstructors() {
 		return instructorRepository.findAll();
@@ -67,19 +44,19 @@ public class InstructorService implements IInstructorService {
 			throw new InstructorNotFoundException("Instructor not found for given id:" + instructorID);
 	}
 
-	public Instructor updateInstructor(int instructorID, Instructor updatedInstructor) {
-		Optional<Instructor> existingInstructor = instructorRepository.findById(instructorID);
-
-		if (existingInstructor.isPresent()) {
-			Instructor instructorToUpdate = existingInstructor.get();
-			instructorToUpdate.setName(updatedInstructor.getName());
-			instructorToUpdate.setSpecialization(updatedInstructor.getSpecialization());
-
-			return instructorRepository.save(instructorToUpdate);
-		} else {
-			throw new InstructorNotFoundException("Instructor not found for given id:" + instructorID);
-		}
-	}
+//	public Instructor updateInstructor(int instructorID, Instructor updatedInstructor) {
+//		Optional<Instructor> existingInstructor = instructorRepository.findById(instructorID);
+//
+//		if (existingInstructor.isPresent()) {
+//			Instructor instructorToUpdate = existingInstructor.get();
+//			instructorToUpdate.setName(updatedInstructor.getName());
+//			instructorToUpdate.setSpecialization(updatedInstructor.getSpecialization());
+//
+//			return instructorRepository.save(instructorToUpdate);
+//		} else {
+//			throw new InstructorNotFoundException("Instructor not found for given id:" + instructorID);
+//		}
+//	}
 
 	public void deleteInstructor(int instructorID) {
 		Instructor instructor = instructorRepository.findById(instructorID).orElseThrow(
@@ -88,21 +65,27 @@ public class InstructorService implements IInstructorService {
 	}
 
 	@Override
-	public List<Instructor> getInstructorsBySpecialization(String specialization) {
-		Specialization spec = Specialization.valueOf(specialization);
-		List<Instructor> instructors = instructorRepository.findBySpecialization(spec);
-		return instructors;
+	public Instructor createInstructor(Instructor instructor) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
-	@Override
-	public Instructor logIn(String email, String password) {
+//	@Override
+//	public List<Instructor> getInstructorsBySpecialization(String specialization) {
+//		Specialization spec = Specialization.valueOf(specialization);
+//		List<Instructor> instructors = instructorRepository.findBySpecialization(spec);
+//		return instructors;
+//	}
 
-		Instructor instructor = instructorRepository.findByEmailAndPassword(email, password)
-				.orElseThrow(() -> new InstructorNotFoundException(
-						String.format("Instructor Not Found with given email:%s and passsword:%s", email, password)));
-
-		instructor = instructorRepository.save(instructor);
-		return instructor;
-	}
+//	@Override
+//	public Instructor logIn(String email, String password) {
+//
+//		Instructor instructor = instructorRepository.findByEmailAndPassword(email, password)
+//				.orElseThrow(() -> new InstructorNotFoundException(
+//						String.format("Instructor Not Found with given email:%s and passsword:%s", email, password)));
+//
+//		instructor = instructorRepository.save(instructor);
+//		return instructor;
+//	}
 
 }

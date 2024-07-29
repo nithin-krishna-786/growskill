@@ -11,41 +11,52 @@ import org.springframework.web.context.request.WebRequest;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
-	
+
 	@ExceptionHandler(InstructorNotFoundException.class)
-    public ResponseEntity<ErrorDetails> resourceNotFoundException(InstructorNotFoundException ex, WebRequest request) {
-        ErrorDetails errorDetails = new ErrorDetails(new Date(), ex.getMessage(), request.getDescription(false));
-        return new ResponseEntity<>(errorDetails, HttpStatus.NOT_FOUND);
-    }
-	
+	public ResponseEntity<ErrorDetails> resourceNotFoundException(InstructorNotFoundException ex, WebRequest request) {
+		ErrorDetails errorDetails = new ErrorDetails(new Date(), ex.getMessage(), request.getDescription(false));
+		return new ResponseEntity<>(errorDetails, HttpStatus.NOT_FOUND);
+	}
+
 	@ExceptionHandler(StudentNotFoundException.class)
-    public ResponseEntity<ErrorDetails> handleStudentNotFoundException(StudentNotFoundException ex, WebRequest request) {
-        ErrorDetails errorDetails = new ErrorDetails(new Date(), ex.getMessage(), request.getDescription(false));
-        return new ResponseEntity<>(errorDetails, HttpStatus.NOT_FOUND);
-    }
-	
+	public ResponseEntity<ErrorDetails> handleStudentNotFoundException(StudentNotFoundException ex,
+			WebRequest request) {
+		ErrorDetails errorDetails = new ErrorDetails(new Date(), ex.getMessage(), request.getDescription(false));
+		return new ResponseEntity<>(errorDetails, HttpStatus.NOT_FOUND);
+	}
+
 	@ExceptionHandler(IllegalArgumentException.class)
-	 public ResponseEntity<ErrorDetails> handleIllegalArgumentException(IllegalArgumentException ex, WebRequest request) {
-       ErrorDetails errorDetails = new ErrorDetails(new Date(), ex.getMessage(), request.getDescription(false));
-       return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
-   }
+	public ResponseEntity<ErrorDetails> handleIllegalArgumentException(IllegalArgumentException ex,
+			WebRequest request) {
+		ErrorDetails errorDetails = new ErrorDetails(new Date(), ex.getMessage(), request.getDescription(false));
+		return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
+	}
 
 	@ExceptionHandler(MethodArgumentNotValidException.class)
-	 public ResponseEntity<ErrorDetails> methodArgumentNotValidException(MethodArgumentNotValidException ex, WebRequest request) {
-        ErrorDetails errorDetails = new ErrorDetails(new Date(), ex.getMessage(), request.getDescription(false));
-        return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
-    }
-	
+	public ResponseEntity<ErrorDetails> methodArgumentNotValidException(MethodArgumentNotValidException ex,
+			WebRequest request) {
+		ErrorDetails errorDetails = new ErrorDetails(new Date(), ex.getMessage(), request.getDescription(false));
+		return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
+	}
+
 	@ExceptionHandler(InternalServerErrorException.class)
-	 public ResponseEntity<ErrorDetails> handleInternalServerErrorException(InternalServerErrorException ex, WebRequest request) {
-       ErrorDetails errorDetails = new ErrorDetails(new Date(), ex.getMessage(), request.getDescription(false));
-       return new ResponseEntity<>(errorDetails, HttpStatus.INTERNAL_SERVER_ERROR);
-   }
-	
+	public ResponseEntity<ErrorDetails> handleInternalServerErrorException(InternalServerErrorException ex,
+			WebRequest request) {
+		ErrorDetails errorDetails = new ErrorDetails(new Date(), ex.getMessage(), request.getDescription(false));
+		return new ResponseEntity<>(errorDetails, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+
+	@ExceptionHandler(UserAlreadyExistsException.class)
+	public ResponseEntity<ErrorDetails> handleUserAlreadyExistsException(UserAlreadyExistsException ex,
+			WebRequest request) {
+		ErrorDetails errorDetails = new ErrorDetails(new Date(), ex.getMessage(), request.getDescription(false));
+		return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
+	}
+
 	@ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorDetails> handleAnyOtherException(Exception ex, WebRequest request) {
-        ErrorDetails errorDetails = new ErrorDetails(new Date(), ex.getMessage(), request.getDescription(false));
-        return new ResponseEntity<>(errorDetails, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-	
+	public ResponseEntity<ErrorDetails> handleAnyOtherException(Exception ex, WebRequest request) {
+		ErrorDetails errorDetails = new ErrorDetails(new Date(), ex.getMessage(), request.getDescription(false));
+		return new ResponseEntity<>(errorDetails, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+
 }

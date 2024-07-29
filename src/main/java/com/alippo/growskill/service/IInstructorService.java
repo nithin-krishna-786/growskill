@@ -14,9 +14,9 @@ public interface IInstructorService {
 	Instructor createInstructor(Instructor instructor);
 	List<Instructor> getAllInstructors();
 	Instructor getInstructorById(int instructorID);
-	List<Instructor> getInstructorsBySpecialization(String specialization);
-	Instructor updateInstructor(int instructorID, Instructor updatedInstructor);
+//	List<Instructor> getInstructorsBySpecialization(String specialization);
+//	Instructor updateInstructor(int instructorID, Instructor updatedInstructor);
 	void deleteInstructor(int instructorID);
-	Instructor logIn(String username,String password);
+//	Instructor logIn(String username,String password);
 
 }

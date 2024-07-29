@@ -23,13 +23,16 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/students")
+@RequestMapping("/api/student")
 public class StudentController {
 
 	@Autowired
@@ -38,13 +41,25 @@ public class StudentController {
 	@Autowired
 	private ModelMapper modelMapper;
 
-	@PostMapping("/register")
-	public ResponseEntity<StudentDTO> registerStudent(@RequestBody @Valid StudentDTO studentDTO) {
-		Student student = modelMapper.map(studentDTO, Student.class);
-		Student registeredStudent = studentService.registerStudent(student);
-		StudentDTO result = modelMapper.map(registeredStudent, StudentDTO.class);
-		return new ResponseEntity<>(result, HttpStatus.CREATED);
-	}
+//	@PostMapping("/register")
+//	public ResponseEntity<?> registerStudent(@RequestBody @Valid StudentDTO studentDTO,BindingResult bindingResult) {
+//		
+//		Boolean errorExists = false;
+//
+//		Map<String, String> errors = new HashMap<>();
+//		if (bindingResult.hasErrors()) {
+//			errorExists = true;
+//			bindingResult.getFieldErrors().forEach(error -> {
+//				errors.put(error.getField(), error.getDefaultMessage());
+//			});
+//			return ResponseEntity.badRequest().body(errors);
+//		}
+//
+//		Student student = modelMapper.map(studentDTO, Student.class);
+//		Student registeredStudent = studentService.registerStudent(student);
+//		StudentDTO result = modelMapper.map(registeredStudent, StudentDTO.class);
+//		return new ResponseEntity<>(result, HttpStatus.CREATED);
+//	}
 
 	@PostMapping("/enroll/{studentId}/{courseId}")
 	public ResponseEntity<EnrollmentDTO> enrollInCourse(@PathVariable Integer studentId, @PathVariable Integer courseId,
@@ -54,16 +69,6 @@ public class StudentController {
 		return new ResponseEntity<>(enrollmentDTO, HttpStatus.CREATED);
 	}
 
-	@PostMapping("/login")
-	public ResponseEntity<Student> studentLogin(String email, String password) {
-		Student student = studentService.login(email, password);
-
-		if (student != null)
-			return new ResponseEntity<>(student, HttpStatus.OK);
-		else
-			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-
-	}
 
 	@PostMapping("/attendClass/{enrollmentId}/{classId}")
 	public ResponseEntity<String> attendClass(@PathVariable Integer enrollmentId, @PathVariable Integer classId)
@@ -135,5 +140,14 @@ public class StudentController {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid current passcode");
 		}
 	}
-
+	
+	@GetMapping("/test")
+	public ResponseEntity<String> testAPI()
+	{
+		return new ResponseEntity<>("Test API Working",HttpStatus.OK);
+	}
+	
+	
+	
+	
 }

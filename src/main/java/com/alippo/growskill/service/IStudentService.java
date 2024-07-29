@@ -2,6 +2,7 @@ package com.alippo.growskill.service;
 
 import java.util.List;
 
+import com.alippo.growskill.dto.StudentDTO;
 import com.alippo.growskill.entities.Certificate;
 import com.alippo.growskill.entities.Enrollment;
 import com.alippo.growskill.entities.PaymentStatus;
@@ -11,8 +12,7 @@ import com.alippo.growskill.exceptions.ClassInCourseNotFoundException;
 import com.alippo.growskill.exceptions.EnrollmentNotFoundException;
 import com.alippo.growskill.entities.ClassInCourse;
 
-public interface IStudentService {
-
+public interface IStudentService{
 	Student registerStudent(Student student);
 //	List<Enrollment> studentLogin(Student student);
 	Enrollment enrollInCourse(Integer StudentID, Integer courseID, PaymentStatus paymentStatus);
@@ -21,9 +21,8 @@ public interface IStudentService {
 	List<Recording> downloadRecordings(Enrollment enrollment);
 	Enrollment getEnrollmentById(Integer enrollmentId) throws EnrollmentNotFoundException;
 	ClassInCourse getClassById(Integer classId,Integer enrollmentId) throws ClassInCourseNotFoundException;
-	Student login(String email, String password);
 	Boolean validatePasscode(String email,String passcode);
 	String generatePasscode(Integer passcodeLength);
 	Boolean savePasscode(String email, String passcode);
-	boolean updatePassword(String email, String newPassword);
+	Boolean updatePassword(String email, String newPassword);
 }
