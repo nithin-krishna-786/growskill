@@ -4,33 +4,48 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import com.alippo.growskill.dto.InstructorDTO;
 import com.alippo.growskill.entities.Instructor;
-import com.alippo.growskill.mapper.MapperClass;
 import com.alippo.growskill.service.InstructorService;
-
 import jakarta.validation.Valid;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/instructor")
 public class InstructorController {
 
 	@Autowired
 	private InstructorService instructorService;
-	
+
 	@Autowired
 	private ModelMapper modelMapper;
 
-	@PostMapping("/instructor")
-	public ResponseEntity<Instructor> createInstructor(@RequestBody @Valid InstructorDTO instructorDTO) {
-		Instructor instructor = modelMapper.map(instructorDTO,Instructor.class);
+	@PostMapping
+	public ResponseEntity<?> createInstructor(@RequestBody @Valid InstructorDTO instructorDTO,
+			BindingResult bindingResult) {
+
+		// THIS CODE PROVIDES ERROR MESSAGES AT INDIVIDUAL ATTRIBUTE LEVEL
+		Boolean errorExists = false;
+
+		Map<String, String> errors = new HashMap<>();
+		if (bindingResult.hasErrors()) {
+			errorExists = true;
+			bindingResult.getFieldErrors().forEach(error -> {
+				errors.put(error.getField(), error.getDefaultMessage());
+			});
+			return ResponseEntity.badRequest().body(errors);
+		}
+
+		Instructor instructor = modelMapper.map(instructorDTO, Instructor.class);
 		Instructor result = instructorService.createInstructor(instructor);
-		
-		if(result != null)
+
+		if (result != null)
 			return new ResponseEntity<>(result, HttpStatus.CREATED);
 		else
 			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -39,8 +54,8 @@ public class InstructorController {
 	@GetMapping("/instructor")
 	public ResponseEntity<List<Instructor>> getAllInstructors() {
 		List<Instructor> allInstructors = instructorService.getAllInstructors();
-		
-		if(allInstructors != null)
+
+		if (allInstructors != null)
 			return new ResponseEntity<>(allInstructors, HttpStatus.OK);
 		else
 			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -56,6 +71,7 @@ public class InstructorController {
 	@PutMapping("/{instructorID}")
 	public ResponseEntity<InstructorDTO> updateInstructor(@PathVariable int instructorID,
 			@RequestBody InstructorDTO instructorDTO) {
+
 		Instructor updatedInstructor = instructorService.updateInstructor(instructorID,
 				MapperClass.mapDTOToEntity(instructorDTO));
 
@@ -69,15 +85,13 @@ public class InstructorController {
 	}
 
 	@GetMapping("/login")
-	public ResponseEntity<Instructor> logIn(String username,String password)
-	{
+	public ResponseEntity<Instructor> logIn(String username, String password) {
 		Instructor instructor = instructorService.logIn(username, password);
-		
-		if(instructor != null)
-			return new ResponseEntity<>(instructor,HttpStatus.OK);
+
+		if (instructor != null)
+			return new ResponseEntity<>(instructor, HttpStatus.OK);
 		else
-			return new ResponseEntity<>(null , HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
-	
-	
+
 }

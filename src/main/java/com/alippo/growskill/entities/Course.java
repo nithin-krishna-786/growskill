@@ -27,6 +27,9 @@ public class Course {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "course_id")
 	private int id;
+	
+	@Column(name = "course_name")
+	private String courseName;
 
 	@Column(name = "specialization")
 	@Enumerated(EnumType.STRING)
@@ -36,8 +39,8 @@ public class Course {
 	private List<ClassInCourse> classList = new ArrayList<>();
 
 	@OneToOne
-	@JoinColumn(name = "instructor_id", referencedColumnName = "instructor_id")
-	private Instructor instructor;
+	@JoinColumn(name = "instructor_id", referencedColumnName = "id")
+	private User instructor;
 	
 	@Column(name ="number_of_classes")
 	private Integer numberOfClasses;

@@ -65,8 +65,7 @@ public class AdminController {
 	public ResponseEntity<ClassInCourseDTO> createClassInCourse(@PathVariable("courseID") Integer courseID,
 			@RequestBody ClassInCourseDTO classInCourseDTO) {
 
-		Course course = courseService.getCourseById(courseID)
-				.orElseThrow(() -> new CourseNotFoundException("CourseNotFound"));
+		Course course = courseService.getCourseById(courseID);
 		ClassInCourse classInCourse = modelMapper.map(classInCourseDTO, ClassInCourse.class);
 		ClassInCourse result = adminService.createClassInCourse(classInCourse,course);
 		

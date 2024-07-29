@@ -7,7 +7,7 @@ import com.alippo.growskill.entities.Course;
 
 public interface ICourseService {
 	List<Course> getAllCourses();
-	public Optional<Course> getCourseById(int id);
-	public Course saveCourse(Course course);
+	public Course getCourseById(int id);
+	public Course createCourse(Course course);
 	public void deleteCourse(int id);
 }

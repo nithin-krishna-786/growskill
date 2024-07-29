@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/course")
 public class CourseController {
 
 	@Autowired
@@ -27,54 +27,45 @@ public class CourseController {
 	@Autowired
 	private ModelMapper modelMapper;
 
-	@GetMapping("/course")
-	public List<CourseDTO> getAllCourses() {
+	@GetMapping("/courses")
+	public ResponseEntity<List<CourseDTO>> getAllCourses() {
 		List<Course> courses = courseService.getAllCourses();
 		List<CourseDTO> courseDTOs = new ArrayList<>();
 		CourseDTO courseDTO = new CourseDTO();
+		
 		for (Course course : courses) {
 			courseDTO = modelMapper.map(course, CourseDTO.class);
 			courseDTOs.add(courseDTO);
 		}
-		return courseDTOs;
-	}
-
-	@GetMapping("/course/{id}")
-	public ResponseEntity<?> getCourseById(@PathVariable int id) {
-		Optional<Course> course = courseService.getCourseById(id);
 		
-		if(course.isPresent())
-		{	
-			CourseDTO courseDTO = modelMapper.map(course.get(), CourseDTO.class);
-			return new ResponseEntity<>(courseDTO, HttpStatus.OK);
-		}
-		else
-			return new ResponseEntity<>("Course Not Found for ID:"+id,HttpStatus.NOT_FOUND);
+		return new ResponseEntity<>(courseDTOs, HttpStatus.OK);
 	}
 
-	@PostMapping("/course")
-	public ResponseEntity<?> saveCourse(@RequestBody CourseDTO courseDTO) {
-		Course course = modelMapper.map(courseDTO,Course.class);
-		Course savedCourse = courseService.saveCourse(course);
-		if(savedCourse != null)
-		{	
+	@GetMapping("/{id}")
+	public ResponseEntity<CourseDTO> getCourseById(@PathVariable int id) {
+		Course course = courseService.getCourseById(id);
+		CourseDTO courseDTO = modelMapper.map(course, CourseDTO.class);
+		return new ResponseEntity<>(courseDTO, HttpStatus.OK);
+	}
+
+	@PostMapping
+	public ResponseEntity<?> createCourse(@RequestBody CourseDTO courseDTO) {
+		
+		Course course = modelMapper.map(courseDTO, Course.class);
+		Course savedCourse = courseService.createCourse(course);
+
+		if (savedCourse != null) {
 			CourseDTO savedCourseDTO = modelMapper.map(savedCourse, CourseDTO.class);
 			return new ResponseEntity<>(savedCourseDTO, HttpStatus.CREATED);
-		}
-		else
-		{
+		} else {
 			return new ResponseEntity<>("Failed to Create Course", HttpStatus.INTERNAL_SERVER_ERROR);
 		}
+
 	}
 
-	@DeleteMapping("/course/{id}")
+	@DeleteMapping("/{id}")
 	public ResponseEntity<String> deleteCourse(@PathVariable int id) {
-		Optional<Course> course = courseService.getCourseById(id);
-		if (course.isPresent()) {
-			courseService.deleteCourse(id);
-			return new ResponseEntity<>("Course deleted successfully", HttpStatus.OK);
-		} else {
-			return new ResponseEntity<>("Course not found", HttpStatus.NOT_FOUND);
-		}
+		courseService.deleteCourse(id);
+			return new ResponseEntity<>("Course deleted successfully", HttpStatus.NO_CONTENT);
 	}
 }

@@ -1,5 +1,6 @@
 package com.alippo.growskill.entities;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -21,39 +22,15 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 @Entity
-@Table(name = "student")
+@Table(name = "students")
 @Data
-public class Student {
-	
-	@Id
-	@GeneratedValue(strategy=GenerationType.IDENTITY)	
-    private Integer id;
-	
-	@Column(name="student_name")
-    private String studentName;
-	
-	@Column(name="email",unique = true)
-    private String email;
-	
-	@Column(name="password")
-	private String password;
-	
-	@Column(name="phone_number",unique = true)
-    private String phoneNumber;
+public class Student extends User {
 
-    @OneToMany(mappedBy = "student")		
-    private List<Enrollment> enrollments;	
-    
-    @CreationTimestamp
-    @Column(name="date_of_creation")
-    private Date creationDateAndTime;
-    
-    @Column(name="last_logged_In")
-    private Date lastLoggedIn;
-    
-    @Column(name="verified")
-    private Boolean verified;
-    
-    @Column(name="passcode")
-    private String passCode;
+	@OneToMany(mappedBy = "student")
+	private List<Enrollment> enrollments;
+
+	@Column(name = "college")
+	private String college;
+
+
 }

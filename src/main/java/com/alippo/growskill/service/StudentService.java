@@ -1,6 +1,7 @@
 package com.alippo.growskill.service;
 
 import java.security.SecureRandom;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -68,7 +69,7 @@ public class StudentService implements IStudentService {
 		if (!violations.isEmpty()) {
 			throw new IllegalArgumentException("Validation error: " + violations.iterator().next().getMessage());
 		}
-		Date creationDateAndTime = new Date();
+		LocalDateTime creationDateAndTime = LocalDateTime.now();
 		student.setCreationDateAndTime(creationDateAndTime);
 
 		student.setVerified(false);
@@ -131,13 +132,16 @@ public class StudentService implements IStudentService {
 
 	@Override
 	public List<Recording> downloadRecordings(Enrollment enrollment) {
+		
 		if (enrollment.getCompletionStatus().equals(CompletionStatus.COMPLETED)) {
 			List<ClassInCourse> classList = enrollment.getCourse().getClassList();
 			List<Recording> recordingsList = new ArrayList<>();
+			
 			for (ClassInCourse classInTheList : classList) {
 				Recording recording = classInTheList.getRecording();
 				recordingsList.add(recording);
 			}
+			
 			return recordingsList;
 		}
 		return null;
@@ -171,7 +175,7 @@ public class StudentService implements IStudentService {
 				.orElseThrow(() -> new StudentNotFoundException(
 						String.format("Student Not Found with given email:%s and passsword:%s", email, password)));
 
-		Date loggedDateAndTime = new Date();
+		LocalDateTime loggedDateAndTime = LocalDateTime.now();
 		student.setLastLoggedIn(loggedDateAndTime);
 		student = studentRepository.save(student);
 		return student;
