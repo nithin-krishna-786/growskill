@@ -39,7 +39,7 @@ public class InstructorService implements IInstructorService {
 		roles.add(userRole);
 
 		instructor.setRoles(roles);
-		
+
 		instructor.setVerified(false);
 
 		int passcode = generatePasscode(Constants.PASSCODE_LENGTH);

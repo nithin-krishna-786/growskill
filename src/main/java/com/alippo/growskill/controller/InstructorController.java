@@ -44,15 +44,13 @@ public class InstructorController {
 
 		Instructor instructor = modelMapper.map(instructorDTO, Instructor.class);
 		Instructor result = instructorService.createInstructor(instructor);
-
-		if (result != null)
-			return new ResponseEntity<>(result, HttpStatus.CREATED);
-		else
-			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+		instructorDTO = modelMapper.map(result, InstructorDTO.class);
+		
+		return new ResponseEntity<>(instructorDTO, HttpStatus.CREATED);
 	}
 
 	@GetMapping("/instructor")
-	public ResponseEntity<List<Instructor>> getAllInstructors() {
+	public ResponseEntity<List<InstructorD>> getAllInstructors() {
 		List<Instructor> allInstructors = instructorService.getAllInstructors();
 
 		if (allInstructors != null)

@@ -15,8 +15,7 @@ public class InstructorDTO extends UserDTO{
 	@Enumerated(EnumType.STRING)
 	private Specialization specialization;
 
-    private LocalDateTime creationDateAndTime;
-    private LocalDateTime lastLoggedIn;
+    private String qualification;
 }
 
 
